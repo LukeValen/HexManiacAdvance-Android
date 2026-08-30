@@ -532,7 +532,7 @@ Name = '''moveeffectoptions'''
    '''Unused16''',
    '''LowerAccuracy1Primary''',
    '''LowerEvasion1Primary''',
-   '''RemoveStateChanges''',
+   '''RemoveStatChanges''',
    '''Bide''',
    '''2to3turnsThenConfused''',
    '''OpponentSwitch''',
@@ -932,43 +932,6 @@ Name = '''battletowerEvFlags'''
     '''Speed''',
     '''SpAttack''',
     '''SpDefense''',
-]
-
-[[List]]
-Name = '''traineraibits'''
-0 = [
-   '''CheckBadMove''',
-   '''TryToKO''',
-   '''CheckViability''',
-   '''SetupFirstTurn''',
-   '''Risky''',
-   '''PreferStrongestMove''',
-   '''PreferBatonPass''',
-   '''DoubleBattle''',
-   '''HPAware''',
-   '''Unknown''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Ret''',
-   '''Roaming''',
-   '''Safari''',
-   '''FirstBattle''',
 ]
 
 [[List]]
