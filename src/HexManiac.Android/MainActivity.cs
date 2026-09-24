@@ -20,6 +20,7 @@ public class MainActivity : Activity {
 
    protected override void OnCreate(Bundle? state) {
       base.OnCreate(state);
+      ActionBar?.Hide();
       var layout = new LinearLayout(this) { Orientation = Orientation.Vertical };
       layout.SetPadding(24, 24, 24, 24);
       status = new TextView(this) { Text = "Selecione uma ROM GBA para começar." };
@@ -52,7 +53,7 @@ public class MainActivity : Activity {
          StartActivityForResult(intent, SaveRequest);
       };
       layout.AddView(save);
-      var scroll = new ScrollView(this) { FillViewport = true, ContentDescription = "HexManiac Mobile" };
+      var scroll = new SafeAreaScrollView(this) { FillViewport = true, ContentDescription = "HexManiac Mobile" };
       scroll.AddView(layout);
       SetContentView(scroll);
       layout.FocusableInTouchMode = true;
