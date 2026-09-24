@@ -34,10 +34,10 @@ public class MainActivity : Activity {
       };
       layout.AddView(open);
       offset = new EditText(this) { Hint = "Offset hexadecimal (ex.: 100)" };
-      offset.InputType = Android.Text.InputTypes.ClassText;
+      offset.InputType = global::Android.Text.InputTypes.ClassText;
       layout.AddView(offset);
       value = new EditText(this) { Hint = "Novo byte hexadecimal (00–FF)" };
-      value.InputType = Android.Text.InputTypes.ClassText;
+      value.InputType = global::Android.Text.InputTypes.ClassText;
       layout.AddView(value);
       var edit = new Button(this) { Text = "Alterar byte" };
       edit.Click += (_, _) => EditByte();
@@ -98,12 +98,12 @@ public class MainActivity : Activity {
          }
       } catch (Exception ex) {
          status.Text = $"Erro: {ex.Message}";
-         Android.Util.Log.Error("HexManiacMobile", ex.ToString());
+         global::Android.Util.Log.Error("HexManiacMobile", ex.ToString());
       }
    }
 
    private string QueryName(global::Android.Net.Uri uri) {
-      using var cursor = ContentResolver!.Query(uri, new[] { Android.Provider.OpenableColumns.DisplayName }, null, null, null);
+      using var cursor = ContentResolver!.Query(uri, new[] { global::Android.Provider.OpenableColumns.DisplayName }, null, null, null);
       if (cursor != null && cursor.MoveToFirst()) return cursor.GetString(0) ?? romName;
       return romName;
    }
