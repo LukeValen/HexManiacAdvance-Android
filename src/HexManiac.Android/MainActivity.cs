@@ -55,6 +55,8 @@ public class MainActivity : Activity {
       var scroll = new ScrollView(this) { FillViewport = true, ContentDescription = "HexManiac Mobile" };
       scroll.AddView(layout);
       SetContentView(scroll);
+      layout.FocusableInTouchMode = true;
+      layout.RequestFocus();
    }
 
    private void EditByte() {
