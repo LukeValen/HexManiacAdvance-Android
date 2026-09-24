@@ -102,7 +102,7 @@ public class MainActivity : Activity {
       }
    }
 
-   private string QueryName(Android.Net.Uri uri) {
+   private string QueryName(global::Android.Net.Uri uri) {
       using var cursor = ContentResolver!.Query(uri, new[] { Android.Provider.OpenableColumns.DisplayName }, null, null, null);
       if (cursor != null && cursor.MoveToFirst()) return cursor.GetString(0) ?? romName;
       return romName;
