@@ -13,7 +13,7 @@ jobs:
       - name: Install Android workload
         run: dotnet workload install android
       - name: Build debug APK
-        run: dotnet build src/HexManiac.Android/HexManiac.Android.csproj -c Debug -p:AndroidPackageFormat=apk
+        run: dotnet build src/HexManiac.Android/HexManiac.Android.csproj -c Debug -p:AndroidPackageFormat=apk -p:EmbedAssembliesIntoApk=true
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
