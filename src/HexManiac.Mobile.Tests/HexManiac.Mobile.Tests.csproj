@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../HexManiac.Core/HexManiac.Core.csproj" />
+    <Compile Include="../HexManiac.Android/MobileModelLoader.cs" Link="MobileModelLoader.cs" />
     <Compile Include="../HexManiac.Android/MobileTables.cs" Link="MobileTables.cs" />
     <Compile Include="../HexManiac.Android/HexEditorSession.cs" Link="HexEditorSession.cs" />
     <Content Include="../HexManiac.Core/Models/Code/*.txt;../HexManiac.Core/Models/Code/*.toml;../HexManiac.Core/Models/Code/*.md;../HexManiac.Core/Models/Code/*.py">

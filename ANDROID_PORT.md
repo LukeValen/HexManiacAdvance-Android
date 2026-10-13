@@ -1,5 +1,14 @@
 # HexManiac Mobile — Android port
 
+## 0.3.2: reference-derived item counts
+
+The Android loader now supplies empty StoredMetadata for ROMs without a sidecar,
+matching the desktop loader. Passing null skipped DecodeConstantsFromReference,
+leaving data.items.count unresolved and showing only the placeholder item.
+Counts are read from the ROM using the original reference constants, not hardcoded.
+A synthetic regression reproduces the one-record bug and checks the shared Android
+loader with two different counts, byte-identical loading, last-item edits and undo.
+
 ## 0.3.1: Android metadata initialization fix
 
 MetadataInfo now reads AssemblyFileVersionAttribute from the loaded assembly instead

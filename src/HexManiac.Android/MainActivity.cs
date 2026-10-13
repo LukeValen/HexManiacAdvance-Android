@@ -269,11 +269,8 @@ public class MainActivity : Activity {
             var name = QueryName(data.Data);
             var loaded = await Task.Run(async () => {
                var references = MobileResources.Load(ApplicationContext!);
-               var gameCode = Encoding.ASCII.GetString(bytes, 0xAC, 4) + bytes[0xBC];
                var hash = System.Security.Cryptography.SHA256.HashData(bytes);
-               PokemonModel parsed = references.GameReferenceTables.ContainsKey(gameCode)
-                  ? new HardcodeTablesModel(references, bytes)
-                  : new PokemonModel(bytes);
+               var parsed = MobileModelLoader.Create(bytes, references);
                await parsed.InitializationWorkload;
                if (!hash.SequenceEqual(System.Security.Cryptography.SHA256.HashData(parsed.RawData)))
                   throw new InvalidDataException("A leitura dos metadados alterou a ROM. A abertura foi interrompida.");
