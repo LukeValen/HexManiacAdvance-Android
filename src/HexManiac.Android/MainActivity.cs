@@ -80,8 +80,9 @@ public class MainActivity : Activity {
    }
 
    private EditText Input(string hint) {
-      var input = new EditText(this) { Hint = hint, SingleLine = true,
+      var input = new EditText(this) { Hint = hint,
          InputType = global::Android.Text.InputTypes.ClassText | global::Android.Text.InputTypes.TextFlagNoSuggestions };
+      input.SetSingleLine(true);
       input.SetTextColor(Foreground);
       input.SetHintTextColor(Color.Rgb(160, 169, 189));
       return input;
