@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <ApplicationId>io.github.hexmaniac.mobile</ApplicationId>
     <ApplicationTitle>HexManiac Mobile</ApplicationTitle>
+    <ApplicationVersion>2</ApplicationVersion>
+    <ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
+    <AndroidManifest>AndroidManifest.xml</AndroidManifest>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

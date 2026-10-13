@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Route Back through the unsaved-edit confirmation on Android 13+. -->
+  <application android:enableOnBackInvokedCallback="false" />
+</manifest>

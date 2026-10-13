@@ -1,22 +1,64 @@
-# HexManiac Mobile — primeiro protótipo
+# HexManiac Mobile — Android port
 
-Este fork acrescenta `src/HexManiac.Android`, um teste funcional do Core original no Android.
-Abre uma ROM com o seletor do sistema, inicializa `PokemonModel`, altera um byte por offset hexadecimal e exporta uma cópia. Não inclui ainda os editores de tabelas, mapas, scripts ou interface Avalonia. Mantenha ROMs originais fora do repositório.
+## 0.2.0: hexadecimal workspace
 
-## Desenvolvimento pelo telefone
+The Android app reuses the original `HexManiac.Core` through native Android controls.
+This milestone adds an 8-column hex grid, byte selection by touch, 128-byte pages,
+hexadecimal goto, and undo/redo through `ChangeHistory<ModelDelta>`.
+An unchanged byte does not invalidate redo. Undo/redo returns selection to the edited address.
 
-1. Crie um fork de `haven1433/HexManiacAdvance` no GitHub e aplique estes arquivos à sua branch.
-2. No Termux, edite e faça `git push` para disparar **Actions → Android APK**.
-3. Baixe o artifact `HexManiac-Mobile-debug` na execução concluída, extraia o ZIP e instale o APK.
-4. Abra uma cópia de uma ROM própria, edite um byte conhecido e salve como outro arquivo. Compare os arquivos e confira se apenas esse byte mudou.
+The interface includes a dark workspace, selected-byte highlight, ROM name/code/size,
+and an unsaved-change indicator. Opening another ROM or pressing Back asks before
+discarding edits. Editing is disabled while selecting/loading/saving documents.
+Rotation retains the current Activity. Android process termination can still lose
+unsaved edits; persistent session recovery is a later milestone.
 
-A compilação requer .NET 10 e o workload Android em um runner Linux x86-64. O Core original permanece `net6.0`, referenciado pelo app `net10.0-android`. O projeto usa `SolutionDir` porque o Core consulta essa propriedade para incluir `SharedAssemblyInfo.cs`. O APK de debug é para testes locais e não é um release assinado para distribuição.
+ROM files are opened and exported with Android's document picker. Input is bounded
+to 32 MiB (standard GBA ROM address space); larger expanded files are not yet supported.
+Raw hexadecimal editing is low-level: bounds and history do not guarantee game validity.
+Export success is reported only after the output stream has flushed and closed.
 
-## Próximas etapas
+## Build and validation
 
-- Validar o APK e a inicialização em ROMs de teste sem dados privados.
-- Implementar navegação hex, seleção por toque, goto e undo/redo.
-- Definir e implementar a interface final (Avalonia ou controles Android) após medir tamanho, desempenho e integração real do Core.
-- Integrar metadados, tabelas e diálogos do Core; por último imagens, scripts e mapas.
+The `Android APK` workflow installs .NET 10, runs the UI-independent mobile editor
+checks against the original Core, installs the Android workload and builds a
+self-contained debug APK. Download `HexManiac-Mobile-debug` from the workflow.
+The project remains `net10.0-android`, referencing the original `net6.0` Core.
 
-O código original mantém sua licença MIT (`LICENSE`).
+The synthetic-ROM checks cover byte-exact changes, undo/redo, saved state,
+divergent edits, unchanged writes, first/last addresses, partial pages and invalid input.
+No commercial ROM data is included.
+
+Device acceptance:
+1. Open a copy of a ROM; select a byte and navigate to the first and last pages.
+2. Change one byte, undo and redo; confirm the unsaved indicator.
+3. Export and compare the copy: only the intended byte should differ.
+4. Cancel the picker, rotate, open the keyboard and try Back with unsaved edits.
+5. Confirm file errors preserve the existing session and undo history.
+
+## Porting sequence and original code
+
+The long-term goal is feature parity with desktop, including map editing. This
+milestone is the editing foundation, not completion of the full port.
+
+| Stage | Work | Existing source to reuse |
+| --- | --- | --- |
+| 1 — current | Hex selection, goto, byte edits, undo/redo, export | Models/ModelDelta.cs; ViewModels/ChangeHistory.cs |
+| 2 | Package/load reference files and metadata on Android; anchor navigation and search; session recovery | Models/PokemonModel.cs; Models/Code; ViewModels/ViewPort.cs |
+| 3 | Structured tables: Pokémon, moves, items, trainers | ViewModels/Tools/TableTool.cs and array element view models |
+| 4 | Game text editor with resizing/repointing and metadata persistence | ViewModels/Tools/PCSTool.cs; Models/Runs/PCSRun.cs |
+| 5 | Sprites, palettes and tilemaps with import/export | ViewModels/Tools/SpriteTool.cs; PaletteCollection.cs |
+| 6 | Event scripts, compilation and cross-navigation | ViewModels/Tools/CodeTool.cs; CodeBody.cs; Models/Code |
+| 7 | Map browser/rendering, zoom/pan, blocks, collisions, events, warps and connections | Models/Map/MapModel.cs; ViewModels/Map/MapEditorViewModel.cs; BlockMapViewModel.cs; BlockEditor.cs |
+| 8 | Advanced tools, patch support, parity audit and device validation | Remaining Core tools and desktop commands |
+
+Stage 2 must verify the reference assets are actually available inside the installed
+APK before exposing structured editors. Referencing the Core project alone is not
+proof that all desktop metadata and filesystem assumptions work on Android.
+
+Retain the desktop organization (data view, navigation and tool panels), adapting
+panels for small screens and touch. The native Android UI is the current implementation;
+no migration to Avalonia is included. Each stage must validate export and undo before
+enabling the next structured editor.
+
+The upstream MIT license is preserved in `LICENSE`. Keep ROMs outside this repository.

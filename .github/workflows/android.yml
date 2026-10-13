@@ -10,6 +10,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      - name: Test mobile editor against Core
+        run: dotnet run --project src/HexManiac.Mobile.Tests/HexManiac.Mobile.Tests.csproj -c Debug
       - name: Install Android workload
         run: dotnet workload install android
       - name: Build debug APK
