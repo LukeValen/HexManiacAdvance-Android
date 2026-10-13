@@ -729,18 +729,20 @@ Use `special2 variable name` when doing an action that has a result.
 
    internal class MetadataInfo : IMetadataInfo {
       public string VersionNumber { get; }
-      public bool IsPublicRelease {
-         get {
-            var assembly = Assembly.GetExecutingAssembly();
-            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            return fvi.FilePrivatePart == 0;
-         }
-      }
+      public bool IsPublicRelease { get; }
       public MetadataInfo() {
-         var assembly = Assembly.GetExecutingAssembly();
-         var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-         VersionNumber = $"{fvi.FileMajorPart}.{fvi.FileMinorPart}.{fvi.FileBuildPart}";
-         if (fvi.FilePrivatePart != 0) VersionNumber += "." + fvi.FilePrivatePart;
+         // Android can bundle assemblies without a physical DLL at Assembly.Location.
+         // The file-version attribute preserves desktop version semantics without file IO.
+         var assembly = typeof(MetadataInfo).Assembly;
+         var fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
+         if (!Version.TryParse(fileVersion, out var version)) {
+            version = assembly.GetName().Version ?? new Version(0, 0, 0, 0);
+         }
+         var build = Math.Max(0, version.Build);
+         var revision = Math.Max(0, version.Revision);
+         VersionNumber = $"{version.Major}.{version.Minor}.{build}";
+         if (revision != 0) VersionNumber += "." + revision;
+         IsPublicRelease = revision == 0;
       }
    }
 

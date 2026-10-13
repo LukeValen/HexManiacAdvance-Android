@@ -21,11 +21,11 @@ jobs:
           mkdir -p apk
           apk_source=$(find . -name '*-Signed.apk' -not -path './apk/*' -print -quit)
           test -n "$apk_source"
-          cp "$apk_source" apk/HexManiac-Mobile-0.3.0.apk
-          python3 -c 'import zipfile; z=zipfile.ZipFile("apk/HexManiac-Mobile-0.3.0.apk"); required=["assets/resources/"+n for n in ["default.toml","tableReference.txt","pcsReference.txt","hma.py"]]; assert all(n in z.namelist() for n in required), "Missing APK reference assets"'
+          cp "$apk_source" apk/HexManiac-Mobile-0.3.1.apk
+          python3 -c 'import zipfile; z=zipfile.ZipFile("apk/HexManiac-Mobile-0.3.1.apk"); required=["assets/resources/"+n for n in ["default.toml","tableReference.txt","pcsReference.txt","hma.py"]]; assert all(n in z.namelist() for n in required), "Missing APK reference assets"'
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: HexManiac-Mobile-debug
-          path: "apk/HexManiac-Mobile-0.3.0.apk"
+          path: "apk/HexManiac-Mobile-0.3.1.apk"
           if-no-files-found: error

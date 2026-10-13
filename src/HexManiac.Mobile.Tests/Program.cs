@@ -6,6 +6,19 @@ static void Check(bool condition, string message) {
    if (!condition) throw new Exception(message);
 }
 
+// Reproduce APK-like loading: this assembly has no on-disk Location.
+var memoryAssembly = System.Reflection.Assembly.Load(File.ReadAllBytes(typeof(PokemonModel).Assembly.Location));
+Check(string.IsNullOrEmpty(memoryAssembly.Location), "Regression fixture has no physical DLL");
+var metadataType = memoryAssembly.GetType("HavenSoft.HexManiac.Core.Models.MetadataInfo", throwOnError: true)!;
+var memoryMetadata = Activator.CreateInstance(metadataType, nonPublic: true)!;
+var memoryVersion = (string)metadataType.GetProperty("VersionNumber")!.GetValue(memoryMetadata)!;
+var memoryRelease = (bool)metadataType.GetProperty("IsPublicRelease")!.GetValue(memoryMetadata)!;
+var diskVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(PokemonModel).Assembly.Location);
+var expectedVersion = $"{diskVersion.FileMajorPart}.{diskVersion.FileMinorPart}.{diskVersion.FileBuildPart}";
+if (diskVersion.FilePrivatePart != 0) expectedVersion += "." + diskVersion.FilePrivatePart;
+Check(memoryVersion == expectedVersion && memoryRelease == (diskVersion.FilePrivatePart == 0), "In-memory metadata preserves desktop version semantics");
+Console.WriteLine("PASS: metadata version works without a physical DLL and matches desktop file version.");
+
 Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 var references = new Singletons();
 Check(references.GameReferenceTables.ContainsKey("BPRE1"), "FireRed Rev 1 references");

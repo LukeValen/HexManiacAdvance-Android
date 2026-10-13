@@ -1,5 +1,13 @@
 # HexManiac Mobile — Android port
 
+## 0.3.1: Android metadata initialization fix
+
+MetadataInfo now reads AssemblyFileVersionAttribute from the loaded assembly instead
+of calling FileVersionInfo on Assembly.Location. Bundled Android assemblies need not
+have a physical DLL path. The version string and public-release flag retain the desktop
+file-version semantics. A regression check loads Core from bytes (empty Location),
+constructs MetadataInfo and compares both properties with the desktop file version.
+
 ## 0.3.0: reference assets and structured data
 
 Reference TXT/TOML/script files from the original Core are packaged as Android assets
