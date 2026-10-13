@@ -57,6 +57,14 @@ public sealed class HexEditorSession {
       return true;
    }
 
+   public void WriteBytes(int address, byte[] bytes) {
+      if (address < 0 || (long)address + bytes.Length > Model.Count) throw new ArgumentOutOfRangeException(nameof(address));
+      if (bytes.Select((b, i) => Model[address + i] == b).All(equal => equal)) return;
+      history.CurrentChange.ChangeData(Model, address, bytes);
+      history.ChangeCompleted();
+      SelectedAddress = address;
+   }
+
    public void Undo() { if (CanUndo) history.Undo.Execute(null); }
    public void Redo() { if (CanRedo) history.Redo.Execute(null); }
    public void MarkSaved() => history.TagAsSaved();

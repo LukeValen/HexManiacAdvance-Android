@@ -16,6 +16,8 @@ public class MainActivity : Activity {
    private const int OpenRequest = 100, SaveRequest = 101;
    private HexEditorSession? session;
    private bool busy;
+   private LinearLayout hexPane = null!;
+   private TablePanel tablePanel = null!;
    private TextView status = null!, summary = null!, pageLabel = null!;
    private EditText offset = null!, value = null!;
    private LinearLayout grid = null!;
@@ -41,28 +43,39 @@ public class MainActivity : Activity {
       save = AddButton(files, "Salvar cópia", SaveRom);
       status = Label("Selecione uma ROM GBA para começar.", 14);
       layout.AddView(status);
-      var navigation = Row(layout);
+      var tabs = Row(layout);
+      editingControls.Add(AddButton(tabs, "Hexadecimal", () => ShowData(false)));
+      editingControls.Add(AddButton(tabs, "Dados / Tabelas", () => ShowData(true)));
+      var history = Row(layout);
+      undo = AddButton(history, "Desfazer", () => { session?.Undo(); Refresh(); });
+      redo = AddButton(history, "Refazer", () => { session?.Redo(); Refresh(); });
+      hexPane = new LinearLayout(this) { Orientation = Orientation.Vertical };
+      layout.AddView(hexPane);
+      var navigation = Row(hexPane);
       offset = Input("Endereço hex (ex.: 0x100)");
       navigation.AddView(offset, new LinearLayout.LayoutParams(0, -2, 1));
       editingControls.Add(offset);
       editingControls.Add(AddButton(navigation, "Ir", GoTo, false));
-      var editRow = Row(layout);
+      var editRow = Row(hexPane);
       value = Input("Byte (00–FF)");
       editRow.AddView(value, new LinearLayout.LayoutParams(0, -2, 1));
       editingControls.Add(value);
       editingControls.Add(AddButton(editRow, "Aplicar", EditByte, false));
-      var history = Row(layout);
-      undo = AddButton(history, "Desfazer", () => { session?.Undo(); Refresh(); });
-      redo = AddButton(history, "Refazer", () => { session?.Redo(); Refresh(); });
-      var pages = Row(layout);
+      var pages = Row(hexPane);
       previous = AddButton(pages, "◀ Anterior", () => { session?.MovePage(-1); Refresh(); });
       next = AddButton(pages, "Próxima ▶", () => { session?.MovePage(1); Refresh(); });
       pageLabel = Label("Toque em um byte para selecioná-lo.", 13);
-      layout.AddView(pageLabel);
+      hexPane.AddView(pageLabel);
       grid = new LinearLayout(this) { Orientation = Orientation.Vertical };
       var horizontal = new HorizontalScrollView(this);
       horizontal.AddView(grid);
-      layout.AddView(horizontal);
+      hexPane.AddView(horizontal);
+      tablePanel = new TablePanel(this, () => session, Refresh, address => {
+         session?.Select(address);
+         ShowData(false);
+         Refresh();
+      }) { Visibility = ViewStates.Gone };
+      layout.AddView(tablePanel);
       var scroll = new SafeAreaScrollView(this) { FillViewport = true, ContentDescription = "HexManiac Mobile" };
       scroll.SetBackgroundColor(Background);
       scroll.AddView(layout);
@@ -70,6 +83,18 @@ public class MainActivity : Activity {
       layout.FocusableInTouchMode = true;
       layout.RequestFocus();
       Refresh();
+   }
+
+   private void ShowData(bool data) {
+      hexPane.Visibility = data ? ViewStates.Gone : ViewStates.Visible;
+      tablePanel.Visibility = data ? ViewStates.Visible : ViewStates.Gone;
+      if (data) tablePanel.Refresh();
+   }
+
+   private static void EnableTree(View view, bool enabled) {
+      view.Enabled = enabled;
+      if (view is ViewGroup group)
+         for (var i = 0; i < group.ChildCount; i++) EnableTree(group.GetChildAt(i)!, enabled);
    }
 
    private TextView Label(string text, float size) {
@@ -166,6 +191,7 @@ public class MainActivity : Activity {
 
    private void UpdateControls() {
       var ready = session != null && !busy;
+      EnableTree(tablePanel, ready);
       open.Enabled = !busy;
       save.Enabled = ready;
       foreach (var control in editingControls) control.Enabled = ready;
@@ -214,6 +240,7 @@ public class MainActivity : Activity {
             }
          }
       }
+      tablePanel.Refresh();
       UpdateControls();
    }
 
@@ -241,12 +268,19 @@ public class MainActivity : Activity {
             if (bytes.Length < 0xC0) throw new InvalidDataException("Arquivo pequeno demais para uma ROM GBA.");
             var name = QueryName(data.Data);
             var loaded = await Task.Run(async () => {
-               var parsed = new PokemonModel(bytes);
+               var references = MobileResources.Load(ApplicationContext!);
+               var gameCode = Encoding.ASCII.GetString(bytes, 0xAC, 4) + bytes[0xBC];
+               var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+               PokemonModel parsed = references.GameReferenceTables.ContainsKey(gameCode)
+                  ? new HardcodeTablesModel(references, bytes)
+                  : new PokemonModel(bytes);
                await parsed.InitializationWorkload;
+               if (!hash.SequenceEqual(System.Security.Cryptography.SHA256.HashData(parsed.RawData)))
+                  throw new InvalidDataException("A leitura dos metadados alterou a ROM. A abertura foi interrompida.");
                return parsed;
             });
             session = new HexEditorSession(loaded, name);
-            status.Text = "ROM carregada. Toque em um byte ou digite um endereço.";
+            status.Text = $"ROM carregada • {MobileTables.Catalog(loaded).Length} tabelas reconhecidas. Abra Dados / Tabelas.";
          } else if (session != null) {
             status.Text = "Salvando cópia...";
             using (var destination = ContentResolver!.OpenOutputStream(data.Data, "wt") ?? throw new IOException("Não foi possível salvar a cópia.")) {

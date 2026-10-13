@@ -4,14 +4,19 @@
     <OutputType>Exe</OutputType>
     <ApplicationId>io.github.hexmaniac.mobile</ApplicationId>
     <ApplicationTitle>HexManiac Mobile</ApplicationTitle>
-    <ApplicationVersion>2</ApplicationVersion>
-    <ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
+    <ApplicationVersion>3</ApplicationVersion>
+    <ApplicationDisplayVersion>0.3.0</ApplicationDisplayVersion>
     <AndroidManifest>AndroidManifest.xml</AndroidManifest>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <SolutionDir>$(MSBuildProjectDirectory)/../../</SolutionDir>
   </PropertyGroup>
+  <ItemGroup>
+    <AndroidAsset Include="../HexManiac.Core/Models/Code/*.txt;../HexManiac.Core/Models/Code/*.toml;../HexManiac.Core/Models/Code/*.md;../HexManiac.Core/Models/Code/*.py;../HexManiac.Core/Models/Code/*.hma">
+      <Link>resources/%(Filename)%(Extension)</Link>
+    </AndroidAsset>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../HexManiac.Core/HexManiac.Core.csproj" />
   </ItemGroup>

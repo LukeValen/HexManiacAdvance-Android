@@ -1,5 +1,32 @@
 # HexManiac Mobile — Android port
 
+## 0.3.0: reference assets and structured data
+
+Reference TXT/TOML/script files from the original Core are packaged as Android assets
+and copied to private app storage before initializing the text converter or models.
+The desktop Core uses a relative resources directory; the app sets its working directory
+once before constructing Singletons. Supported game revisions now open through
+HardcodeTablesModel, as in the desktop editor. Unknown revisions keep basic hex editing.
+Loading compares SHA-256 before/after interpretation and refuses a model that changed ROM bytes.
+
+The Dados / Tabelas panel provides Pokemon, move and item shortcuts, a searchable
+catalog of recognized tables, record search, previous/next record and jump to hex.
+Names and field formats come from the Core. The initial editable fields are unsigned
+numeric Pokemon stats, move power/accuracy/PP/effect accuracy, item price and parameter.
+Input is decimal and checked against the actual field width; multi-byte writes are
+one undo transaction shared with the hex editor. Other fields are currently read-only.
+Text editing, enum selectors, table resizing, pointer edits and metadata sidecar export
+are not part of this milestone. Existing custom sidecar metadata is not imported yet.
+
+CI now also checks reference loading and structured edits with synthetic tables,
+and verifies required assets exist inside the final signed APK. Artifacts contain
+one installable file: HexManiac-Mobile-0.3.0.apk.
+
+Device acceptance for this milestone: open FireRed Rev 1, confirm recognized tables,
+search for a Pokemon, change one stat, undo/redo and export a copy. Reopen the copy
+and confirm the value. Repeat with a two-byte item price; unrelated bytes must match.
+
+
 ## 0.2.0: hexadecimal workspace
 
 The Android app reuses the original `HexManiac.Core` through native Android controls.
